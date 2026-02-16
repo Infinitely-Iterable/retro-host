@@ -1,0 +1,317 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; }
+
+:root {
+    --bg: #0a0a12;
+    --bg-shelf: #151520;
+    --surface: #1a1a2e;
+    --surface-hover: #22223a;
+    --border: #2a2a40;
+    --shelf-edge: #3d2b1f;
+    --shelf-face: #5c3d2e;
+    --shelf-highlight: #7a5440;
+    --text: #e0d8ef;
+    --text-muted: #6a6488;
+    --neon-pink: #ff2a6d;
+    --neon-blue: #05d9e8;
+    --neon-purple: #d300c5;
+    --neon-green: #39ff14;
+    --neon-orange: #ff6e27;
+    --system-gb: #39ff14;
+    --system-gbc: #d300c5;
+    --system-gba: #05d9e8;
+    --system-nes: #ff2a6d;
+    --system-snes: #ff6e27;
+}
+
+body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    margin: 0;
+    min-height: 100vh;
+    background-image:
+        radial-gradient(ellipse at 20% 50%, rgba(255, 42, 109, 0.03) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 50%, rgba(5, 217, 232, 0.03) 0%, transparent 50%);
+}
+
+/* Subtle scanline overlay */
+body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0, 0, 0, 0.08) 2px,
+        rgba(0, 0, 0, 0.08) 4px
+    );
+    pointer-events: none;
+    z-index: 9999;
+}
+
+/* Header */
+header {
+    padding: 28px 24px 0;
+    text-align: center;
+}
+
+header h1 {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 28px;
+    font-weight: 400;
+    margin: 0;
+    letter-spacing: 2px;
+    color: var(--neon-blue);
+    text-shadow:
+        0 0 7px var(--neon-blue),
+        0 0 20px var(--neon-blue),
+        0 0 42px rgba(5, 217, 232, 0.4);
+}
+
+header h1 .accent {
+    color: var(--neon-pink);
+    text-shadow:
+        0 0 7px var(--neon-pink),
+        0 0 20px var(--neon-pink),
+        0 0 42px rgba(255, 42, 109, 0.4);
+}
+
+/* System tabs */
+nav#system-tabs {
+    display: flex;
+    gap: 10px;
+    padding: 20px 24px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    justify-content: center;
+}
+
+.system-tab {
+    flex-shrink: 0;
+    padding: 8px 18px;
+    border-radius: 4px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    cursor: pointer;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 10px;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-transform: uppercase;
+}
+
+.system-tab:hover {
+    background: var(--surface-hover);
+    color: var(--text);
+    border-color: var(--neon-blue);
+    box-shadow: 0 0 8px rgba(5, 217, 232, 0.15);
+}
+
+.system-tab.active {
+    color: var(--neon-blue);
+    border-color: var(--neon-blue);
+    background: var(--surface-hover);
+    box-shadow:
+        0 0 8px rgba(5, 217, 232, 0.2),
+        inset 0 0 12px rgba(5, 217, 232, 0.05);
+}
+
+.system-tab .count {
+    font-size: 8px;
+    color: var(--text-muted);
+    background: var(--bg);
+    padding: 2px 6px;
+    border-radius: 3px;
+}
+
+.system-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.system-dot.gb {
+    background: var(--system-gb);
+    box-shadow: 0 0 6px var(--system-gb);
+}
+.system-dot.gbc {
+    background: var(--system-gbc);
+    box-shadow: 0 0 6px var(--system-gbc);
+}
+.system-dot.gba {
+    background: var(--system-gba);
+    box-shadow: 0 0 6px var(--system-gba);
+}
+.system-dot.nes {
+    background: var(--system-nes);
+    box-shadow: 0 0 6px var(--system-nes);
+}
+.system-dot.snes {
+    background: var(--system-snes);
+    box-shadow: 0 0 6px var(--system-snes);
+}
+
+/* ROM list */
+main#rom-list {
+    padding: 0 24px 40px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Shelf row — each grid acts as a shelf */
+.rom-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 16px;
+    padding: 20px 20px 12px;
+    margin-bottom: 8px;
+    background:
+        linear-gradient(180deg, rgba(30, 30, 50, 0.6) 0%, rgba(20, 20, 35, 0.8) 100%);
+    border-radius: 4px;
+    position: relative;
+}
+
+/* Shelf edge — the wooden ledge beneath the games */
+.rom-grid::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 0;
+    right: 0;
+    height: 8px;
+    background: linear-gradient(180deg, var(--shelf-face) 0%, var(--shelf-edge) 60%, #2a1a10 100%);
+    border-radius: 0 0 2px 2px;
+    box-shadow:
+        0 2px 8px rgba(0, 0, 0, 0.5),
+        inset 0 1px 0 var(--shelf-highlight);
+}
+
+/* ROM cards — game cases on the shelf */
+.rom-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 14px;
+    min-height: 100px;
+    background: linear-gradient(145deg, #1e1e35 0%, #161628 100%);
+    border: 1px solid var(--border);
+    border-bottom: 3px solid var(--shelf-face);
+    border-radius: 3px;
+    text-decoration: none;
+    color: var(--text);
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Cartridge/case top edge highlight */
+.rom-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 8px;
+    right: 8px;
+    height: 3px;
+    border-radius: 0 0 2px 2px;
+    background: var(--neon-blue);
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.rom-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--neon-blue);
+    box-shadow:
+        0 4px 20px rgba(5, 217, 232, 0.15),
+        0 0 30px rgba(5, 217, 232, 0.05);
+}
+
+.rom-card:hover::before {
+    opacity: 0.8;
+}
+
+.rom-card .rom-name {
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 4px;
+    word-break: break-word;
+    line-height: 1.3;
+}
+
+.rom-card .rom-file {
+    font-size: 10px;
+    color: var(--text-muted);
+    font-family: monospace;
+}
+
+/* Tag grouping */
+.tag-heading {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 11px;
+    font-weight: 400;
+    color: var(--neon-pink);
+    margin: 32px 0 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-shadow: 0 0 10px rgba(255, 42, 109, 0.3);
+}
+
+.tag-heading:first-child {
+    margin-top: 0;
+}
+
+.rom-card .rom-tag {
+    display: inline-block;
+    margin-top: 8px;
+    font-size: 9px;
+    font-family: 'Press Start 2P', monospace;
+    color: var(--neon-purple);
+    background: rgba(211, 0, 197, 0.1);
+    padding: 3px 8px;
+    border-radius: 2px;
+    border: 1px solid rgba(211, 0, 197, 0.2);
+    text-shadow: 0 0 8px rgba(211, 0, 197, 0.3);
+}
+
+.empty-state {
+    text-align: center;
+    color: var(--text-muted);
+    padding: 60px 20px;
+    font-size: 14px;
+    font-family: 'Press Start 2P', monospace;
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+    header { padding: 20px 16px 0; }
+    header h1 { font-size: 18px; }
+    nav#system-tabs {
+        padding: 12px 16px;
+        justify-content: flex-start;
+    }
+    main#rom-list { padding: 0 12px 24px; }
+
+    .rom-grid {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 10px;
+        padding: 14px 14px 10px;
+    }
+
+    .rom-card {
+        padding: 10px;
+        min-height: 80px;
+    }
+
+    .rom-card .rom-name {
+        font-size: 12px;
+    }
+}

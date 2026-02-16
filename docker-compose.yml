@@ -1,0 +1,16 @@
+services:
+  retro-host:
+    image: ghcr.io/infinitely-iterable/retro-host:latest
+    container_name: retro-host
+    ports:
+      - "6969:6969"
+    volumes:
+      # Unraid: adjust the ROM path to wherever your ROMs are stored
+      - /mnt/user/data/roms:/roms:ro
+      # Unraid: save states persist here across container rebuilds
+      - /mnt/user/appdata/retro-host:/data
+    environment:
+      - ROM_DIR=/roms
+      - DATA_DIR=/data
+      - PORT=6969
+    restart: unless-stopped

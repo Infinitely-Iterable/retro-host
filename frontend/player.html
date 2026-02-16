@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>RetroHost - Playing</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        body { margin: 0; background: #000; overflow: hidden; }
+        #top-bar {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 8px 16px; background: rgba(0,0,0,0.85);
+        }
+        #top-bar a { color: #8be9fd; text-decoration: none; font-size: 14px; }
+        #top-bar .game-title { color: #f8f8f2; font-size: 14px; }
+        #top-bar .actions button {
+            background: #44475a; color: #f8f8f2; border: none;
+            padding: 6px 12px; border-radius: 4px; cursor: pointer;
+            margin-left: 8px; font-size: 13px;
+        }
+        #top-bar .actions button:hover { background: #6272a4; }
+        #game-container {
+            width: 100vw; height: 100vh;
+            display: flex; align-items: center; justify-content: center;
+        }
+    </style>
+</head>
+<body>
+    <div id="top-bar">
+        <a href="/">&larr; Library</a>
+        <span class="game-title" id="game-title"></span>
+        <div class="actions">
+            <button id="btn-save" title="Save to server">Save</button>
+            <button id="btn-load" title="Load from server">Load</button>
+        </div>
+    </div>
+
+    <div id="game-container">
+        <div id="game" style="width:100%;height:calc(100vh - 40px);max-width:100%"></div>
+    </div>
+
+    <script src="/js/player.js"></script>
+</body>
+</html>
