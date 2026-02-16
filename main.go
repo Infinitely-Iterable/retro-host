@@ -22,6 +22,9 @@ func main() {
 		case "list":
 			cmdList(cfg)
 			return
+		case "covers":
+			cmdCovers(cfg)
+			return
 		case "play":
 			if len(os.Args) < 3 {
 				fmt.Fprintf(os.Stderr, "Usage: retro-host play <rom-name>\n")
@@ -45,6 +48,7 @@ func printUsage() {
 	fmt.Println("Usage:")
 	fmt.Println("  retro-host              Start the web server")
 	fmt.Println("  retro-host list         List all available ROMs")
+	fmt.Println("  retro-host covers       Show cover art status for all ROMs")
 	fmt.Println("  retro-host play <name>  Print URL to play a ROM")
 	fmt.Println("  retro-host help         Show this help message")
 	fmt.Println()
@@ -149,6 +153,49 @@ func cmdPlay(cfg *config.Config, query string) {
 		fmt.Printf("  [%s] %s\n    http://%s/player.html?system=%s&rom=%s&core=%s\n\n",
 			sys.Name, rom.Name, host, rom.System, rom.FileName, sys.Core)
 	}
+}
+
+func cmdCovers(cfg *config.Config) {
+	tags := scanner.LoadTags(cfg.DataDir)
+	roms, err := scanner.ScanROMs(cfg.ROMDir, tags)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error scanning ROMs: %v\n", err)
+		os.Exit(1)
+	}
+
+	if len(roms) == 0 {
+		fmt.Println("No ROMs found in", cfg.ROMDir)
+		return
+	}
+
+	statuses := scanner.CheckCovers(cfg.DataDir, roms)
+
+	w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
+	fmt.Fprintln(w, "SYSTEM\tROM\tCOVER")
+	fmt.Fprintln(w, "------\t---\t-----")
+
+	missing := 0
+	for _, s := range statuses {
+		status := "✓"
+		if !s.HasCover {
+			status = "✗ missing"
+			missing++
+		}
+		sys := scanner.SystemByID(s.ROM.System)
+		sysName := s.ROM.System
+		if sys != nil {
+			sysName = sys.Name
+		}
+		fmt.Fprintf(w, "%s\t%s\t%s\n", sysName, s.ROM.Name, status)
+	}
+	w.Flush()
+
+	fmt.Printf("\n%d/%d ROMs have covers", len(statuses)-missing, len(statuses))
+	if missing > 0 {
+		fmt.Printf(" (%d missing)", missing)
+	}
+	fmt.Println()
+	fmt.Printf("\nPlace cover images in: %s/covers/<system>/<rom-name>.{png,jpg,webp}\n", cfg.DataDir)
 }
 
 func findDir(name, localPath, containerPath string) string {

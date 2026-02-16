@@ -25,6 +25,9 @@ func NewRouter(cfg *config.Config, frontendDir, emulatorJSDir string) http.Handl
 		}
 	})
 
+	// Cover art
+	mux.HandleFunc("/api/covers/", h.ServeCover)
+
 	// ROM file serving
 	mux.HandleFunc("/roms/", h.ServeROM)
 

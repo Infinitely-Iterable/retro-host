@@ -23,11 +23,11 @@ type ROM struct {
 }
 
 var Systems = []System{
-	{ID: "gb", Name: "Game Boy", Extensions: []string{".gb"}, Core: "gb"},
-	{ID: "gbc", Name: "Game Boy Color", Extensions: []string{".gbc"}, Core: "gb"},
-	{ID: "gba", Name: "Game Boy Advance", Extensions: []string{".gba"}, Core: "vba_next"},
-	{ID: "nes", Name: "NES", Extensions: []string{".nes"}, Core: "nes"},
-	{ID: "snes", Name: "SNES", Extensions: []string{".smc", ".sfc"}, Core: "snes"},
+	{ID: "gb", Name: "Game Boy", Extensions: []string{".gb"}, Core: "gambatte"},
+	{ID: "gbc", Name: "Game Boy Color", Extensions: []string{".gbc"}, Core: "gambatte"},
+	{ID: "gba", Name: "Game Boy Advance", Extensions: []string{".gba"}, Core: "mgba"},
+	{ID: "nes", Name: "NES", Extensions: []string{".nes"}, Core: "fceumm"},
+	{ID: "snes", Name: "SNES", Extensions: []string{".smc", ".sfc"}, Core: "snes9x"},
 }
 
 // File extensions to ignore (save files, patches, etc.)
@@ -78,6 +78,38 @@ func LoadTags(dataDir string) TagsConfig {
 		return TagsConfig{}
 	}
 	return tags
+}
+
+// CoverStatus represents whether a ROM has a cover image.
+type CoverStatus struct {
+	ROM      ROM
+	HasCover bool
+}
+
+// CheckCovers checks which ROMs have cover images in the data directory.
+func CheckCovers(dataDir string, roms map[string][]ROM) []CoverStatus {
+	var results []CoverStatus
+	coverExts := []string{".png", ".jpg", ".webp"}
+
+	for _, sys := range Systems {
+		romList, ok := roms[sys.ID]
+		if !ok {
+			continue
+		}
+		for _, rom := range romList {
+			romName := strings.TrimSuffix(rom.FileName, filepath.Ext(rom.FileName))
+			hasCover := false
+			for _, ext := range coverExts {
+				coverPath := filepath.Join(dataDir, "covers", sys.ID, romName+ext)
+				if _, err := os.Stat(coverPath); err == nil {
+					hasCover = true
+					break
+				}
+			}
+			results = append(results, CoverStatus{ROM: rom, HasCover: hasCover})
+		}
+	}
+	return results
 }
 
 func ScanROMs(romDir string, tags TagsConfig) (map[string][]ROM, error) {

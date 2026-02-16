@@ -96,12 +96,21 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             groups[tag].forEach(rom => {
                 const card = document.createElement('a');
-                card.className = 'rom-card';
+                card.className = 'rom-card no-cover';
                 card.href = `/player.html?system=${sys.id}&rom=${encodeURIComponent(rom.fileName)}&core=${sys.core}`;
+
+                const romName = rom.fileName.replace(/\.[^.]+$/, '');
+                const coverUrl = `/api/covers/${sys.id}/${encodeURIComponent(romName)}`;
+
                 card.innerHTML = `
-                    <div class="rom-name">${escapeHtml(rom.name)}</div>
-                    <div class="rom-file">${escapeHtml(rom.fileName)}</div>
-                    ${rom.tag ? `<div class="rom-tag">${escapeHtml(rom.tag)}</div>` : ''}
+                    <img class="rom-cover hidden" src="${coverUrl}" alt=""
+                         onload="this.classList.remove('hidden'); this.parentElement.classList.remove('no-cover');"
+                         onerror="this.classList.add('hidden');">
+                    <div class="rom-info">
+                        <div class="rom-name">${escapeHtml(rom.name)}</div>
+                        <div class="rom-file">${escapeHtml(rom.fileName)}</div>
+                        ${rom.tag ? `<div class="rom-tag">${escapeHtml(rom.tag)}</div>` : ''}
+                    </div>
                 `;
                 grid.appendChild(card);
             });

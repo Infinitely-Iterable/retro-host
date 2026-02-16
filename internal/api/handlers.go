@@ -110,6 +110,35 @@ func findROMFile(romDir, filename string) string {
 	return found
 }
 
+func (h *Handler) ServeCover(w http.ResponseWriter, r *http.Request) {
+	// URL: /api/covers/{system}/{romName}
+	parts := strings.SplitN(strings.TrimPrefix(r.URL.Path, "/api/covers/"), "/", 2)
+	if len(parts) != 2 {
+		http.Error(w, "invalid path", http.StatusBadRequest)
+		return
+	}
+
+	system, romName := parts[0], parts[1]
+
+	// Validate to prevent path traversal
+	if strings.Contains(system, "..") || strings.Contains(romName, "..") ||
+		strings.Contains(system, "/") || strings.Contains(romName, "/") {
+		http.Error(w, "invalid path", http.StatusBadRequest)
+		return
+	}
+
+	// Try extensions in order
+	for _, ext := range []string{".png", ".jpg", ".webp"} {
+		coverPath := filepath.Join(h.cfg.DataDir, "covers", system, romName+ext)
+		if _, err := os.Stat(coverPath); err == nil {
+			http.ServeFile(w, r, coverPath)
+			return
+		}
+	}
+
+	http.Error(w, "cover not found", http.StatusNotFound)
+}
+
 func (h *Handler) GetSave(w http.ResponseWriter, r *http.Request) {
 	// URL: /api/saves/{system}/{rom}
 	parts := strings.SplitN(strings.TrimPrefix(r.URL.Path, "/api/saves/"), "/", 2)

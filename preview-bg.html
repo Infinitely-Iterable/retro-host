@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RetroHost Background Preview</title>
+    <style>
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: #0a0a12;
+            background-image:
+                radial-gradient(circle, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+                radial-gradient(ellipse at 20% 50%, rgba(255, 42, 109, 0.03) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 50%, rgba(5, 217, 232, 0.03) 0%, transparent 50%);
+            background-size: 24px 24px, 100% 100%, 100% 100%;
+        }
+
+        /* Scanline overlay */
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(0, 0, 0, 0.08) 2px,
+                rgba(0, 0, 0, 0.08) 4px
+            );
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        .content {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .content h1 {
+            font-family: monospace;
+            font-size: 32px;
+            color: #05d9e8;
+            text-shadow: 0 0 10px rgba(5, 217, 232, 0.5);
+            background: rgba(10, 10, 18, 0.7);
+            padding: 20px 40px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="content">
+        <h1>RetroHost Background Preview</h1>
+    </div>
+</body>
+</html>
